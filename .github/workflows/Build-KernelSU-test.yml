@@ -1,4 +1,4 @@
-name: Build KernelSU
+name: Build KernelSU-test
 on:
   workflow_dispatch:
     inputs:
