@@ -63,22 +63,7 @@ jobs:
        run: |
         cd kernel_workspace/kernel_platform
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        cd KernelSU
-        KSU_VERSION=$(expr $(/usr/bin/git rev-list --count HEAD) "+" 10200)
-        echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
-        sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
         
-     - name: Build kernel
-       run: |
-        cd kernel_workspace
-        ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
-
-     - name: Make AnyKernel3
-       run: |
-        git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
-        rm -rf ./AnyKernel3/.git
-        cp kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/Image ./AnyKernel3/
-
      - name: Upload AnyKernel3
        uses: actions/upload-artifact@v4
        with:
