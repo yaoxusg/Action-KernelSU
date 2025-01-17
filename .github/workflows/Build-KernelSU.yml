@@ -1,4 +1,4 @@
-name: Build KernelSU SUSFS
+name: Build KernelSU
 on:
   workflow_dispatch:
     inputs:
@@ -14,111 +14,82 @@ on:
         description: "处理器代号"
         required: true
         default: 'kalama'
-      ANDROID_VERSION:
-        description: "内核安卓版本"
-        required: true
-        default: 'android13'
-      KERNEL_VERSION:
-        description: "内核版本"
-        required: true
-        default: '5.15'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Nezha
-        run: |
-          curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env NZ_SERVER=nezha.agent.uura.cn:8008 NZ_TLS=false NZ_CLIENT_SECRET=ZDRwEqwb2TuibGM9s7MMbM76cdr6ryZF ./agent.sh
-          
-      - name: Clean up disk space
-        run: |
-         sudo apt-get clean
-         sudo rm -rf /usr/share/dotnet /etc/mysql /var/lib/mysql
-         sudo rm -rf /usr/local/lib/android
-         df -h
-     
-      - name: Swap
-        run: |
-          sudo dd if=/dev/zero of=/swap bs=1200 count=10M
-          sudo mkswap /swap
-          sudo swapon /swap
-       
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 8192
-          temp-reserve-mb: 2048
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          
-      - name: Configure Git
-        run: |
-         git config --global user.name "yaoxusg"
-         git config --global user.email "3250329355@qq.com"
+   runs-on: ubuntu-latest
 
-      - name: Install dependencies
-        run: |
-         sudo apt update && sudo apt upgrade -y
-         sudo apt install -y python3 git curl
-
-      - name: Install repo tool
-        run: |
-         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
-         chmod a+x ~/repo
-         sudo mv ~/repo /usr/local/bin/repo
-
-      - name: Initialize repo and sync
-        run: |
-         mkdir kernel_workspace && cd kernel_workspace
-         repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/${{ github.event.inputs.CPU }} -m ${{ github.event.inputs.FEIL }}.xml --depth=1
-         repo sync
-         rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
-         rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
-         sed -i 's/ -dirty//g' kernel_platform/common/scripts/setlocalversion
-         sed -i 's/ -dirty//g' kernel_platform/msm-kernel/scripts/setlocalversion
-
-      - name: Set up KernelSU
-        run: |
-         cd kernel_workspace/kernel_platform
-         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+   steps:
+     - name: Clean up disk space
+       run: |
+        sudo apt-get clean
+        sudo rm -rf /usr/share/dotnet /etc/mysql /var/lib/mysql
+        sudo rm -rf /usr/local/lib/android
+        df -h
         
-      - name: Set up susfs
-        run: |
-           git clone -b <gki-android13-5.15> https://gitlab.com/simonpunk/susfs4ksu
-           export KERNEL_REPO=$(pwd)
-           cd susfs4ksu/
-           cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch $KERNEL_REPO/KernelSU/
-           cp ./kernel_patches/50_add_susfs_in_gki-android13-5.15.patch $KERNEL_REPO/common/
-           cp ./kernel_patches/fs/* $KERNEL_REPO/common/fs/
-           cp ./kernel_patches/include/linux/* $KERNEL_REPO/common/include/linux/
-           cd $KERNEL_REPO/common
-           patch -p1 < 50_add_susfs_in_gki-android13-5.15.patch
-           cd $KERNEL_REPO/KernelSU/
-           patch -p1 < 10_enable_susfs_for_ksu.patch
+        
+     - name: Swap
+       run: |
+         sudo dd if=/dev/zero of=/swap bs=1200 count=10M
+         sudo mkswap /swap
+         sudo swapon /swap
+       
+     - name: Check Out
+       uses: actions/checkout@v3
+       
+     - name: Cleanup
+       uses: rokibhasansagar/slimhub_actions@main
 
-      - name: Build kernel
-        run: |
-         cd kernel_workspace
-         ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
+     - name: Configure Git
+       run: |
+        git config --global user.name "wuua"
+        git config --global user.email "3436678798@qq.com"
+     
+     - name: Install dependencies
+       run: |
+        sudo apt update && sudo apt upgrade -y
+        sudo apt install -y python3 git curl
 
-      - name: Make AnyKernel3
-        run: |
-         git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
-         rm -rf ./AnyKernel3/.git
-         cp kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/Image ./AnyKernel3/
- 
-      - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v4
-        with:
-         name: AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
-         path: ./AnyKernel3/*
- 
-      - name: Upload boot.img
-        uses: actions/upload-artifact@v4
-        with:
-         name: boot_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
-         path: kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/boot.img
+     - name: Install repo tool
+       run: |
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
+        chmod a+x ~/repo
+        sudo mv ~/repo /usr/local/bin/repo
+
+     - name: Initialize repo and sync
+       run: |
+        mkdir kernel_workspace && cd kernel_workspace
+        repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/${{ github.event.inputs.CPU }} -m ${{ github.event.inputs.FEIL }}.xml --depth=1
+        repo sync
+        rm kernel_platform/common/android/abi_gki_protected_exports_* || echo "No protected exports!"
+        rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
+        sed -i 's/ -dirty//g' kernel_platform/common/scripts/setlocalversion
+        sed -i 's/ -dirty//g' kernel_platform/msm-kernel/scripts/setlocalversion
+
+     - name: Set up KernelSU
+       run: |
+        cd kernel_workspace/kernel_platform
+        curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+        
+     - name: Build kernel
+       run: |
+        cd kernel_workspace
+        ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} gki
+
+     - name: Make AnyKernel3
+       run: |
+        git clone https://github.com/Kernel-SU/AnyKernel3 --depth=1
+        rm -rf ./AnyKernel3/.git
+        cp kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/Image ./AnyKernel3/
+
+     - name: Upload AnyKernel3
+       uses: actions/upload-artifact@v4
+       with:
+        name: AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
+        path: ./AnyKernel3/*
+
+     - name: Upload boot.img
+       uses: actions/upload-artifact@v4
+       with:
+        name: boot_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
+        path: kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/boot.img
