@@ -20,6 +20,16 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:
+     - name: Nezha
+       run: |
+         curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env NZ_SERVER=nezha.agent.uura.cn:8008 NZ_TLS=false NZ_CLIENT_SECRET=ZDRwEqwb2TuibGM9s7MMbM76cdr6ryZF ./agent.sh
+     
+     - name: Swap
+       run: |
+         sudo dd if=/dev/zero of=/swap bs=10240 count=5M
+         sudo mkswap /swap
+         sudo swapon /swap
+       
      - name: Check Out
        uses: actions/checkout@v3
        
@@ -63,7 +73,6 @@ jobs:
        run: |
         cd kernel_workspace/kernel_platform
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        cd KernelSU
         
      - name: Build kernel
        run: |
@@ -79,11 +88,11 @@ jobs:
      - name: Upload AnyKernel3
        uses: actions/upload-artifact@v4
        with:
-        name: AnyKernel3_KernelSU_Next_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
+        name: AnyKernel3_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
         path: ./AnyKernel3/*
 
      - name: Upload boot.img
        uses: actions/upload-artifact@v4
        with:
-        name: boot_KernelSU_Next_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
+        name: boot_KernelSU_${{ env.KSUVER }}_${{ github.event.inputs.FEIL }}
         path: kernel_workspace/kernel_platform/out/msm-kernel-${{ github.event.inputs.CPUD }}-gki/dist/boot.img
