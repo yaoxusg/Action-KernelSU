@@ -26,10 +26,14 @@ jobs:
      
      - name: Swap
        run: |
-         dd if=/dev/zero of=/swap2 bs=30720 count=1M
-         mkswap /swap2
-         swapon /swap2
-         echo "/swap2 swap swap sw 0 0" >> /etc/fstab
+         cd  /
+         sudo  swapoff  -a
+         sudo dd if=/dev/zero of=/swapfile bs=1G count=30
+         sudo chmod 600 /swapfile
+         sudo mkswap /swapfile
+         sudo fdisk -l
+         sudo cp /etc/fstab /etc/fstab.bak
+         echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
        
      - name: Check Out
        uses: actions/checkout@v3
