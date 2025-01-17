@@ -31,10 +31,17 @@ jobs:
       - name: Nezha
         run: |
           curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env NZ_SERVER=nezha.agent.uura.cn:8008 NZ_TLS=false NZ_CLIENT_SECRET=ZDRwEqwb2TuibGM9s7MMbM76cdr6ryZF ./agent.sh
+          
+      - name: Clean up disk space
+        run: |
+         sudo apt-get clean
+         sudo rm -rf /usr/share/dotnet /etc/mysql /var/lib/mysql
+         sudo rm -rf /usr/local/lib/android
+         df -h
      
       - name: Swap
         run: |
-          sudo dd if=/dev/zero of=/swap bs=1600 count=10M
+          sudo dd if=/dev/zero of=/swap bs=2000 count=10M
           sudo mkswap /swap
           sudo swapon /swap
        
