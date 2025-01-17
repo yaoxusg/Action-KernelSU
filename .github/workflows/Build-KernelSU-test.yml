@@ -1,4 +1,4 @@
-name: Build KernelSU-test
+name: Build KernelSU
 on:
   workflow_dispatch:
     inputs:
@@ -20,10 +20,17 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:
-     - name: Check Out
+     - name: Nezha
        run: |
          curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && chmod +x agent.sh && env NZ_SERVER=nezha.agent.uura.cn:8008 NZ_TLS=false NZ_CLIENT_SECRET=ZDRwEqwb2TuibGM9s7MMbM76cdr6ryZF ./agent.sh
      
+     - name: Swap
+       run: |
+       dd if=/dev/zero of=/swap bs=6144 count=5M
+       mkswap /swap
+       swapon /swap
+       echo "/swap swap swap sw 0 0" >> /etc/fstab
+       
      - name: Check Out
        uses: actions/checkout@v3
        
