@@ -44,17 +44,8 @@ jobs:
           sudo dd if=/dev/zero of=/swap bs=1200 count=10M
           sudo mkswap /swap
           sudo swapon /swap
-       
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 8192
-          temp-reserve-mb: 2048
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          
+     
+        
       - name: Configure Git
         run: |
          git config --global user.name "yaoxusg"
