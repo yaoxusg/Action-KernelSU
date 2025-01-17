@@ -28,11 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-     - name: Swap
-       run: |
-         sudo dd if=/dev/zero of=/swap bs=1200 count=10M
-         sudo mkswap /swap
-         sudo swapon /swap
+      - name: Swap
+        run: |
+          sudo dd if=/dev/zero of=/swap bs=1200 count=10M
+          sudo mkswap /swap
+          sudo swapon /swap
        
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
