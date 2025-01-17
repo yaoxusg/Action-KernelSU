@@ -26,7 +26,7 @@ jobs:
      
      - name: Swap
        run: |
-         dd if=/dev/zero of=/swap/swap bs=20 count=1024M
+         dd if=/dev/zero of=/root/swap bs=20 count=1024M
          mkswap /root/swap
          swapon /root/swap
          echo "/root/swap swap swap sw 0 0" >> /etc/fstab
