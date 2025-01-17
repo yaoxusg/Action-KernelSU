@@ -29,7 +29,6 @@ jobs:
          sudo dd if=/dev/zero of=/swap bs=4096 count=5M
          sudo mkswap /swap
          sudo swapon /swap
-         sudo echo "/swap swap swap sw 0 0" >> /etc/fstab
        
      - name: Check Out
        uses: actions/checkout@v3
