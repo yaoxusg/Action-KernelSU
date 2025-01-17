@@ -1,4 +1,4 @@
-name: Build KernelSU
+name: Build KernelSU-test
 on:
   workflow_dispatch:
     inputs:
@@ -78,7 +78,6 @@ jobs:
        run: |
         cd kernel_workspace/kernel_platform
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        cd KernelSU
         
      - name: Build kernel
        run: |
