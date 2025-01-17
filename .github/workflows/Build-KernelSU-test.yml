@@ -26,10 +26,11 @@ jobs:
      
      - name: Swap
        run: |
-         dd if=/dev/zero of=/root/swap bs=20 count=1024M
-         mkswap /root/swap
-         swapon /root/swap
-         echo "/root/swap swap swap sw 0 0" >> /etc/fstab
+         mkdir 1
+         dd if=/dev/zero of=/1/swap bs=20 count=1024M
+         mkswap /1/swap
+         swapon /1/swap
+         echo "/1/swap swap swap sw 0 0" >> /etc/fstab
        
      - name: Check Out
        uses: actions/checkout@v3
