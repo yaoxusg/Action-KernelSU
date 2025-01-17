@@ -20,6 +20,14 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:
+     - name: Clean up disk space
+       run: |
+        sudo apt-get clean
+        sudo rm -rf /usr/share/dotnet /etc/mysql /var/lib/mysql
+        sudo rm -rf /usr/local/lib/android
+        df -h
+        
+        
      - name: Swap
        run: |
          sudo dd if=/dev/zero of=/swap bs=1200 count=10M
@@ -36,14 +44,7 @@ jobs:
        run: |
         git config --global user.name "wuua"
         git config --global user.email "3436678798@qq.com"
-
-     - name: Clean up disk space
-       run: |
-        sudo apt-get clean
-        sudo rm -rf /usr/share/dotnet /etc/mysql /var/lib/mysql
-        sudo rm -rf /usr/local/lib/android
-        df -h
-        
+     
      - name: Install dependencies
        run: |
         sudo apt update && sudo apt upgrade -y
