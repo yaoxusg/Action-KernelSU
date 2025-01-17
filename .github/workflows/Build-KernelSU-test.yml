@@ -26,7 +26,6 @@ jobs:
      
      - name: Swap
        run: |
-         sudo  swapoff  -a
          dd if=/dev/zero of=/swap/swap bs=20 count=1024M
          mkswap /swap/swap
          swapon /swap/swap
