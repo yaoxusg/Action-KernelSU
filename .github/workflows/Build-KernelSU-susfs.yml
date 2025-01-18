@@ -41,7 +41,7 @@ jobs:
          
       - name: Swap
         run: |
-          sudo dd if=/dev/zero of=/mnt/swap bs=1200 count=10M
+          sudo dd if=/dev/zero of=/mnt/swap bs=1500 count=10M
           sudo mkswap /mnt/swap
           sudo swapon /mnt/swap
      
