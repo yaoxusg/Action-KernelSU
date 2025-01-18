@@ -30,9 +30,9 @@ jobs:
         
      - name: Swap
        run: |
-         sudo dd if=/dev/zero of=/swap bs=1200 count=10M
-         sudo mkswap /swap
-         sudo swapon /swap
+         sudo dd if=/dev/zero of=/mnt/swap bs=1500 count=10M
+         sudo mkswap /mnt/swap
+         sudo swapon /mnt/swap
        
      - name: Check Out
        uses: actions/checkout@v3
