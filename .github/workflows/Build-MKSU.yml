@@ -1,4 +1,4 @@
-name: Build MSU Susfs
+name: Build MKSU Susfs
 on:
   workflow_dispatch:
     inputs:
